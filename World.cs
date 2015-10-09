@@ -5,9 +5,9 @@ using System.Collections.Generic;
 
 
 public class World  {
-
-    List<Box> boxList = new List<Box>();
-    List<Box> triggerList = new List<Box>();
+    
+    public List<Box> boxList = new List<Box>();
+    public List<Box> triggerList = new List<Box>();
 
     float g = 1;
 
@@ -15,7 +15,7 @@ public class World  {
     {
         foreach (Box box in boxList)
         {
-            box.AddSpeed(-Vector2.up * g);
+            box.AddSpeed(-Vector2.up * g+Vector2.right*0.5f);
             box.Move(deltaTime);   
         }
     }
@@ -41,22 +41,36 @@ public class World  {
         }
     }
 
-    public bool CheckHit(Box box,out Box hitBox)
+    public void MoveBox(Box box,Vector2 speed)
     {
-        hitBox = null;
-        var ps = box.GetPoints();
+        Vector2 xSpeed = new Vector2(speed.x, 0);
+        Vector2 ySpeed = new Vector2(0, speed.y);
+
         foreach (var b in triggerList)
         {
-            foreach (var p in ps)
-            {
-                if (b.PointInBox(p))
-                {
-                    hitBox = b;
-                    return true;
-                }
-            }
+            if (box.CheckMoveBoxX(b, speed.x))
+                break;
+            //if (box.CheckMoveBox(b, xSpeed))
+            //    break ;
         }
-        return false;
+        foreach (var b in triggerList)
+        {
+            if (box.CheckMoveBoxY(b, speed.y))
+                break;
+            //if (box.CheckMoveBox(b, ySpeed))
+            //    break;
+        }
+
+    }
+
+    public void MoveBoxX()
+    { 
+    
+    }
+
+    public void MoveBoxY()
+    { 
+        
     }
 
 }
