@@ -7,6 +7,7 @@ none,up,down,left,right,
 
 public class Box
 {
+	const float IGNORE_RANGE = 0.0001f;
     public float mass = 0;
     public Vector2 pos;
     public float hwidth, hheight;
@@ -67,16 +68,17 @@ public class Box
 
     public bool CheckMoveBoxX(Box staticBox, float xSpeed)
     {
-        var newPos = pos + new Vector2(xSpeed, 0);
-        if (staticBox.PointInBox(newPos))
+		var newPos = pos + new Vector2(xSpeed, 0);
+		bool isInStaticBox = NewPosInStaticBox(newPos,staticBox);
+		//isInStaticBox = false;
+		if (isInStaticBox)
         {
             //**
-            speed = staticBox.pos - this.pos;
-            speed = speed.normalized * (staticBox.hwidth + this.hwidth) / speed.normalized.x;
-            this.speed.x = 0;
-            speed.y = 0;
-            pos = staticBox.pos + speed;
+            var dir  = -staticBox.pos + this.pos;
+			dir = dir.normalized * (staticBox.hwidth + this.hwidth) / dir.normalized.x;
+			pos.x = (staticBox.pos.x + dir.x);
             //**
+			this.speed.x = 0;
             return true;
         }
         pos = newPos;
@@ -85,16 +87,41 @@ public class Box
     public bool CheckMoveBoxY(Box staticBox, float ySpeed)
     {
         var newPos = pos + new Vector2(0, ySpeed);
-        if (staticBox.PointInBox(newPos))
+		bool isInStaticBox = NewPosInStaticBox(newPos,staticBox);
+        if (isInStaticBox)
         {
             //**
+			var dir = -staticBox.pos + this.pos;
+			dir = dir.normalized * (staticBox.hheight + this.hheight) / dir.normalized.y;
+			pos.y = staticBox.pos.y + dir.y;
             //**
+			this.speed.y = 0;
             return true;
         }
         pos = newPos;
         return false;
     }
 
+	bool NewPosInStaticBox(Vector2 newPos,Box staticBox)
+	{
+		bool isInStaticBox = false;
+		float newMinY = newPos.y-this.hheight;
+		float newMaxY = newPos.y+this.hheight;
+		float staticMinY = staticBox.pos.y-staticBox.hheight;
+		float staticMaxY = staticBox.pos.y+staticBox.hheight;
+		
+		float newMinX = newPos.x - this.hwidth;
+		float newMaxX = newPos.x + this.hwidth;
+		float staticMinX = staticBox.pos.x - staticBox.hwidth;
+		float staticMaxX = staticBox.pos.x + staticBox.hwidth;
+		if ((newMinY > staticMaxY-IGNORE_RANGE || newMaxY-IGNORE_RANGE < staticMinY) ||
+		    (newMinX>staticMaxX-IGNORE_RANGE || newMaxX-IGNORE_RANGE<staticMinX)) {
+			isInStaticBox = false;
+		} else {
+			isInStaticBox = true;
+		}
+		return isInStaticBox;
+	}
 
 
     public Box Clone()

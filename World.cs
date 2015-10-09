@@ -15,7 +15,7 @@ public class World  {
     {
         foreach (Box box in boxList)
         {
-            box.AddSpeed(-Vector2.up * g+Vector2.right*0.5f);
+            box.AddSpeed(-Vector2.up * g+Vector2.right*0.05f);
             box.Move(deltaTime);   
         }
     }
