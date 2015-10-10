@@ -31,52 +31,16 @@ public class Box
         world.MoveBox(this, speed * stepTime);
     }
 
-    /// <summary>
-    /// check hit and return hit pos;
-    /// </summary>
-    /// <param name="staticBox"></param>
-    /// <param name="pos"></param>
-    /// <param name="speed"></param>
-    /// <returns></returns>
-    public bool CheckMoveBox(Box staticBox, Vector2 speed)
+    public bool CheckMoveBoxX(Box staticBox, Vector2 speed)
     {
-        if (speed.Equals(Vector2.zero))
-        {
-            return false;
-        }
-        if (Mathf.Abs(this.pos.x - staticBox.pos.x) - staticBox.hwidth - this.hwidth < Mathf.Abs(speed.x) &&
-            Mathf.Abs(this.pos.y - staticBox.pos.y) - staticBox.hheight - this.hheight < Mathf.Abs(speed.y))
-        {
-            if (speed.normalized.x != 0)
-            {
-                speed = staticBox.pos - this.pos;
-                speed = speed.normalized * (staticBox.hwidth + this.hwidth) / speed.normalized.x;
-                this.speed.x = 0;
-            }
-            else
-            {
-                speed = staticBox.pos - this.pos;
-                speed = speed.normalized * (staticBox.hheight + this.hheight) / speed.normalized.y;
-                this.speed.y = 0;
-            }
-            pos = staticBox.pos + speed;
-            return true;
-        }
-        pos += speed;
-        return false;
-    }
-
-    public bool CheckMoveBoxX(Box staticBox, float xSpeed)
-    {
+        float xSpeed = speed.x;
 		var newPos = pos + new Vector2(xSpeed, 0);
 		bool isInStaticBox = NewPosInStaticBox(newPos,staticBox);
 		//isInStaticBox = false;
 		if (isInStaticBox)
         {
             //**
-            var dir  = -staticBox.pos + this.pos;
-			dir = dir.normalized * (staticBox.hwidth + this.hwidth) / dir.normalized.x;
-			pos.x = (staticBox.pos.x + dir.x);
+            pos = GetPivotPos(staticBox, newPos,speed);
             //**
 			this.speed.x = 0;
             return true;
@@ -84,22 +48,52 @@ public class Box
         pos = newPos;
         return false;
     }
-    public bool CheckMoveBoxY(Box staticBox, float ySpeed)
+
+
+    public bool CheckMoveBoxY(Box staticBox, Vector2 speed)
     {
+        float ySpeed = speed.y;
         var newPos = pos + new Vector2(0, ySpeed);
-		bool isInStaticBox = NewPosInStaticBox(newPos,staticBox);
+        bool isInStaticBox = NewPosInStaticBox(newPos, staticBox);
         if (isInStaticBox)
         {
             //**
-			var dir = -staticBox.pos + this.pos;
-			dir = dir.normalized * (staticBox.hheight + this.hheight) / dir.normalized.y;
-			pos.y = staticBox.pos.y + dir.y;
+            pos = GetPivotPos(staticBox, newPos, speed);
             //**
-			this.speed.y = 0;
+            this.speed.y = 0;
             return true;
         }
         pos = newPos;
         return false;
+    }
+
+    //Get Pivot Pos--
+    Vector2 GetPivotPos(Box staticBox, Vector2 newPos,Vector2 moveDir)
+    {
+        if (staticBox.hwidth <= 0) return newPos;
+        Vector2 tmCenter = newPos;
+        Vector2 p = staticBox.pos - newPos;
+        Vector2 dir = -moveDir;
+        dir = dir.normalized;
+        float absX = Mathf.Abs(dir.x);
+        float absY = Mathf.Abs(dir.y);
+        float heightSum = (staticBox.hheight + this.hheight);
+        float widthSum = (staticBox.hwidth + this.hwidth) ;
+        //up and down--
+        //err:
+        if (absX==0 || absY / absX > Mathf.Abs(staticBox.hheight / staticBox.hwidth))
+        {
+            float y = staticBox.pos.y + (dir.y >= 0 ? heightSum : -heightSum);
+            tmCenter.y = y;
+        }
+        else
+        //left and right--
+        {
+            float x = staticBox.pos.x + (dir.x >= 0 ? widthSum : -widthSum);
+            tmCenter.x = x;
+        }
+        return tmCenter;
+        return moveDir;
     }
 
 	bool NewPosInStaticBox(Vector2 newPos,Box staticBox)

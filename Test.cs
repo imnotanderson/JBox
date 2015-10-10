@@ -9,8 +9,10 @@ public class Test : MonoBehaviour {
     {
         world = new World();
 		world.AddBox(new Box(0, 5, 1, 1));
-		world.AddBox(new Box(0, -2, 50, 1f),true);
-		world.AddBox(new Box(20, -9, 30, 1f),true);
+        world.AddBox(new Box(0, -2, 50, 1f), true);
+        world.AddBox(new Box(20, -9, 30, 1f), true);
+        world.AddBox(new Box(35, -15, 30, 1f), true);
+        world.AddBox(new Box(40, 35, 1, 110f), true);
     }
 
     public void OnDrawGizmos()

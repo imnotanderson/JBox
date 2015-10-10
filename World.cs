@@ -48,14 +48,14 @@ public class World  {
 
         foreach (var b in triggerList)
         {
-            if (box.CheckMoveBoxX(b, speed.x))
+            if (box.CheckMoveBoxX(b, speed))
                 break;
             //if (box.CheckMoveBox(b, xSpeed))
             //    break ;
         }
         foreach (var b in triggerList)
         {
-            if (box.CheckMoveBoxY(b, speed.y))
+            if (box.CheckMoveBoxY(b, speed))
                 break;
             //if (box.CheckMoveBox(b, ySpeed))
             //    break;
