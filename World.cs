@@ -6,6 +6,7 @@ using System.Collections.Generic;
 
 public class World  {
     
+    public Box testBox = null;
     public List<Box> boxList = new List<Box>();
     public List<Box> triggerList = new List<Box>();
 
@@ -38,6 +39,11 @@ public class World  {
         foreach (var box in triggerList)
         {
             box.Draw();
+        }
+        Gizmos.color = Color.green;
+        if(testBox!=null)
+        {
+            testBox.Draw();
         }
     }
 

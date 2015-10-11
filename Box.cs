@@ -40,7 +40,7 @@ public class Box
 		if (isInStaticBox)
         {
             //**
-            pos = GetPivotPos(staticBox, newPos,speed);
+            GetPivotPos(staticBox, newPos,speed);
             //**
 			this.speed.x = 0;
             return true;
@@ -58,7 +58,7 @@ public class Box
         if (isInStaticBox)
         {
             //**
-            pos = GetPivotPos(staticBox, newPos, speed);
+            GetPivotPos(staticBox, newPos, speed);
             //**
             this.speed.y = 0;
             return true;
@@ -68,32 +68,99 @@ public class Box
     }
 
     //Get Pivot Pos--
-    Vector2 GetPivotPos(Box staticBox, Vector2 newPos,Vector2 moveDir)
+    public void GetPivotPos(Box staticBox, Vector2 newPos,Vector2 moveDir)
     {
-        if (staticBox.hwidth <= 0) return newPos;
-        Vector2 tmCenter = newPos;
-        Vector2 p = staticBox.pos - newPos;
-        Vector2 dir = -moveDir;
-        dir = dir.normalized;
-        float absX = Mathf.Abs(dir.x);
-        float absY = Mathf.Abs(dir.y);
-        float heightSum = (staticBox.hheight + this.hheight);
-        float widthSum = (staticBox.hwidth + this.hwidth) ;
-        //up and down--
-        //err:
-        if (absX==0 || absY / absX > Mathf.Abs(staticBox.hheight / staticBox.hwidth))
+        NewGetPivotPos(staticBox,newPos,moveDir);
+        return;
+        pos = newPos;
+        //make a big new box,pos in the line--
+        float w = this.hwidth+staticBox.hwidth;
+        float h = this.hheight+staticBox.hheight;
+        var dir = -moveDir;// this.pos - staticBox.pos;
+        if(dir==Vector2.zero)
         {
-            float y = staticBox.pos.y + (dir.y >= 0 ? heightSum : -heightSum);
-            tmCenter.y = y;
+            dir.y = 1;
+        }
+        Vector2 offset = Vector2.zero;
+        if(dir.x!=0)
+        {
+            offset = (dir/ Mathf.Abs(dir.x))*w;
+            if(Mathf.Abs(offset.y)<h)
+            {
+                pos = staticBox.pos+offset;
+                return;
+            }   
+        }
+        offset = (dir/Mathf.Abs(dir.y)*h);
+        pos = staticBox.pos+offset;
+    }
+
+//bug:
+    public void NewGetPivotPos(Box staticBox, Vector2 newPos,Vector2 moveDir)
+    {
+        pos = newPos;
+        float h = this.hheight+staticBox.hheight;
+        float w = this.hwidth + staticBox.hwidth;
+        Vector2 ravPos = this.pos - staticBox.pos;
+        Vector2[]p = new Vector2[0];
+        var dir = -moveDir;
+        if(dir.x!=0)
+        {
+            float k = dir.y/dir.x;
+            float c = ravPos.x*k+ravPos.y;
+            p = new Vector2[]
+            {
+                new Vector2(-w,k*-w+c),new Vector2(w,k*w+c),
+                new Vector2((h-c)/k,h),new Vector2((-h-c)/k,-h)
+            };
         }
         else
-        //left and right--
         {
-            float x = staticBox.pos.x + (dir.x >= 0 ? widthSum : -widthSum);
-            tmCenter.x = x;
+            ravPos.y = ravPos.y>0?h:-h;
+            pos = staticBox.pos+ravPos;
         }
-        return tmCenter;
-        return moveDir;
+        foreach (var v in p)
+        {
+            if(CheckPointInRayAndBox(ravPos,dir,w,h,v))
+            {
+                pos = staticBox.pos + v;
+                return;   
+            }
+        }
+        Debug.Log("x");
+    }
+    
+    bool CheckPointInRayAndBox(Vector2 rayPoint,Vector2 rayDir,float boxHWidth,float boxHHeight,Vector2 point)
+    {
+        if(Mathf.Abs(point.x)>boxHWidth)return false;
+        if(Mathf.Abs(point.y)>boxHHeight)return false;
+        if(rayDir.x>=0 && rayPoint.x<point.x)return false;
+        if(rayDir.y>=0 && rayPoint.y<point.y)return false;
+        if(rayDir.x<=0 && rayPoint.x>point.x)return false;
+        if(rayDir.y<=0 && rayPoint.y>point.y)return false;
+        return true;
+    }
+
+   public static Vector2 GetPosInBoxLineByDir(float w,float h,Vector2 pos,Vector2 dir)
+    {
+        Vector2 result = Vector2.zero;
+        if(dir==Vector2.zero)
+        {
+            dir = Vector2.up;
+        }
+                Vector2 offset = Vector2.zero;
+        if(dir.x!=0)
+        {
+            offset = (dir/ Mathf.Abs(dir.x))*w;
+            if(Mathf.Abs(offset.y)<h)
+            {
+                result = pos+offset;
+                return result;
+            }   
+        }
+        offset = (dir/Mathf.Abs(dir.y)*h);
+        result = pos+offset;
+        return result;
     }
 
 	bool NewPosInStaticBox(Vector2 newPos,Box staticBox)
