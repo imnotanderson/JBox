@@ -36,16 +36,14 @@ public class Box
         float xSpeed = speed.x;
 		var newPos = pos + new Vector2(xSpeed, 0);
 		bool isInStaticBox = NewPosInStaticBox(newPos,staticBox);
-		//isInStaticBox = false;
 		if (isInStaticBox)
         {
             //**
-            GetPivotPos(staticBox, newPos,speed);
-            //**
-			this.speed.x = 0;
+            //GetPivotPos(staticBox, newPos,speed);
+            ////**
+            //this.speed.x = 0;
             return true;
         }
-        pos = newPos;
         return false;
     }
 
@@ -57,13 +55,8 @@ public class Box
         bool isInStaticBox = NewPosInStaticBox(newPos, staticBox);
         if (isInStaticBox)
         {
-            //**
-            GetPivotPos(staticBox, newPos, speed);
-            //**
-            this.speed.y = 0;
             return true;
         }
-        pos = newPos;
         return false;
     }
 
@@ -91,6 +84,7 @@ public class Box
             ravPos.y = ravPos.y>0?h:-h;
             pos = staticBox.pos+ravPos;
         }
+        //bug :
         foreach (var v in p)
         {
             if(CheckPointInRayAndBox(ravPos,dir,w,h,v))

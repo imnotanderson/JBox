@@ -47,25 +47,24 @@ public class World  {
         }
     }
 
-    public void MoveBox(Box box,Vector2 speed)
+    public void MoveBox(Box box, Vector2 speed)
     {
         Vector2 xSpeed = new Vector2(speed.x, 0);
         Vector2 ySpeed = new Vector2(0, speed.y);
 
         foreach (var b in triggerList)
         {
-            if (box.CheckMoveBoxX(b, speed))
-                break;
-            //if (box.CheckMoveBox(b, xSpeed))
-            //    break ;
+            bool xInBox = (box.CheckMoveBoxX(b, speed));
+            bool yInBox = (box.CheckMoveBoxY(b, speed));
+            if (xInBox || yInBox)
+            {
+                box.GetPivotPos(b, box.pos + speed, speed);
+                if (xInBox) box.speed.x = 0;
+                if (yInBox) box.speed.y = 0;
+                return;
+            }
         }
-        foreach (var b in triggerList)
-        {
-            if (box.CheckMoveBoxY(b, speed))
-                break;
-            //if (box.CheckMoveBox(b, ySpeed))
-            //    break;
-        }
+        box.pos += speed;
 
     }
 
