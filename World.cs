@@ -16,7 +16,8 @@ public class World  {
     {
         foreach (Box box in boxList)
         {
-            box.AddSpeed(-Vector2.up * g+Vector2.right*0.05f);
+            box.AddSpeed(-Vector2.up * g);
+            box.speed.x = 10;
             box.Move(deltaTime);   
         }
     }
@@ -56,11 +57,18 @@ public class World  {
         {
             bool xInBox = (box.CheckMoveBoxX(b, speed));
             bool yInBox = (box.CheckMoveBoxY(b, speed));
+            //logic bug:--
             if (xInBox || yInBox)
             {
                 box.GetPivotPos(b, box.pos + speed, speed);
-                if (xInBox) box.speed.x = 0;
-                if (yInBox) box.speed.y = 0;
+                if (xInBox)
+                {
+                    box.speed.x = 0;
+                }
+                if (yInBox)
+                {
+                    box.speed.y = 0;
+                }
                 return;
             }
         }

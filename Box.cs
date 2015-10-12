@@ -38,10 +38,6 @@ public class Box
 		bool isInStaticBox = NewPosInStaticBox(newPos,staticBox);
 		if (isInStaticBox)
         {
-            //**
-            //GetPivotPos(staticBox, newPos,speed);
-            ////**
-            //this.speed.x = 0;
             return true;
         }
         return false;
@@ -84,7 +80,6 @@ public class Box
             ravPos.y = ravPos.y>0?h:-h;
             pos = staticBox.pos+ravPos;
         }
-        //bug :
         foreach (var v in p)
         {
             if(CheckPointInRayAndBox(ravPos,dir,w,h,v))
@@ -100,9 +95,9 @@ public class Box
         if(Mathf.Abs(point.x)>boxHWidth)return false;
         if(Mathf.Abs(point.y)>boxHHeight)return false;
         if(rayDir.x>=0 && rayPoint.x>point.x)return false;
-        if(rayDir.y>=0 && rayPoint.y<point.y)return false;
+        if(rayDir.y>=0 && rayPoint.y>point.y)return false;
         if(rayDir.x<=0 && rayPoint.x<point.x)return false;
-        if(rayDir.y<=0 && rayPoint.y>point.y)return false;
+        if(rayDir.y<=0 && rayPoint.y<point.y)return false;
         return true;
     }
 
