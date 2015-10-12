@@ -52,25 +52,39 @@ public class World  {
     {
         Vector2 xSpeed = new Vector2(speed.x, 0);
         Vector2 ySpeed = new Vector2(0, speed.y);
-
+        
+        bool xInBox = false;
+        bool yInBox = false;
         foreach (var b in triggerList)
         {
-            bool xInBox = (box.CheckMoveBoxX(b, speed));
-            bool yInBox = (box.CheckMoveBoxY(b, speed));
-            //logic bug:--
-            if (xInBox || yInBox)
+            bool tmXInBox = false;
+            bool tmYInBox = false;
+            tmXInBox = (box.CheckMoveBoxX(b, speed));
+            tmYInBox = (box.CheckMoveBoxY(b, speed));
+            if(tmXInBox || tmYInBox)
+            box.GetPivotPos(b, box.pos + speed, speed);
+            if(tmXInBox)xInBox = true;
+            if(tmYInBox)yInBox = true;
+        }
+        if (xInBox || yInBox)
+        {
+            if (xInBox)
             {
-                box.GetPivotPos(b, box.pos + speed, speed);
-                if (xInBox)
-                {
-                    box.speed.x = 0;
-                }
-                if (yInBox)
-                {
-                    box.speed.y = 0;
-                }
-                return;
+                box.speed.x = 0;
             }
+            else
+            {
+                box.pos.x+=speed.x;
+            }
+            if (yInBox)
+            {
+                box.speed.y = 0;
+            }
+            else
+            {
+                box.pos.y+=speed.y;
+            }
+            return;
         }
         box.pos += speed;
 
