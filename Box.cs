@@ -68,35 +68,7 @@ public class Box
     }
 
     //Get Pivot Pos--
-    public void GetPivotPos(Box staticBox, Vector2 newPos,Vector2 moveDir)
-    {
-        NewGetPivotPos(staticBox,newPos,moveDir);
-        return;
-        pos = newPos;
-        //make a big new box,pos in the line--
-        float w = this.hwidth+staticBox.hwidth;
-        float h = this.hheight+staticBox.hheight;
-        var dir = -moveDir;// this.pos - staticBox.pos;
-        if(dir==Vector2.zero)
-        {
-            dir.y = 1;
-        }
-        Vector2 offset = Vector2.zero;
-        if(dir.x!=0)
-        {
-            offset = (dir/ Mathf.Abs(dir.x))*w;
-            if(Mathf.Abs(offset.y)<h)
-            {
-                pos = staticBox.pos+offset;
-                return;
-            }   
-        }
-        offset = (dir/Mathf.Abs(dir.y)*h);
-        pos = staticBox.pos+offset;
-    }
-
-//bug:
-    public void NewGetPivotPos(Box staticBox, Vector2 newPos,Vector2 moveDir)
+    public void GetPivotPos(Box staticBox, Vector2 newPos, Vector2 moveDir)
     {
         pos = newPos;
         float h = this.hheight+staticBox.hheight;
@@ -107,7 +79,7 @@ public class Box
         if(dir.x!=0)
         {
             float k = dir.y/dir.x;
-            float c = ravPos.x*k+ravPos.y;
+            float c = -ravPos.x*k+ravPos.y;
             p = new Vector2[]
             {
                 new Vector2(-w,k*-w+c),new Vector2(w,k*w+c),
@@ -127,16 +99,15 @@ public class Box
                 return;   
             }
         }
-        Debug.Log("x");
     }
     
     bool CheckPointInRayAndBox(Vector2 rayPoint,Vector2 rayDir,float boxHWidth,float boxHHeight,Vector2 point)
     {
         if(Mathf.Abs(point.x)>boxHWidth)return false;
         if(Mathf.Abs(point.y)>boxHHeight)return false;
-        if(rayDir.x>=0 && rayPoint.x<point.x)return false;
+        if(rayDir.x>=0 && rayPoint.x>point.x)return false;
         if(rayDir.y>=0 && rayPoint.y<point.y)return false;
-        if(rayDir.x<=0 && rayPoint.x>point.x)return false;
+        if(rayDir.x<=0 && rayPoint.x<point.x)return false;
         if(rayDir.y<=0 && rayPoint.y>point.y)return false;
         return true;
     }
