@@ -59,7 +59,7 @@ public class World
         {
             if (xInBox)
             {
-                box.speed.x = 0;
+                box.SetXSpeed(0);
             }
             else
             {
@@ -67,7 +67,7 @@ public class World
             }
             if (yInBox)
             {
-                box.speed.y = 0;
+                box.SetYSpeed(0);
             }
             else
             {

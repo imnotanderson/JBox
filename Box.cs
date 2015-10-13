@@ -118,6 +118,21 @@ public class Box
         if (mass == 0) return;
         addSpeed += force / mass;
     }
+
+    public void SetXSpeed(float x)
+    {
+        var val = this.speed;
+        val.x = x;
+        this.speed = val;
+    }
+    public void SetYSpeed(float y)
+    {
+        var val = this.speed;
+        val.y = y;
+        this.speed = val;
+    }
+
+
     #endregion
 
     #region calc
