@@ -44,6 +44,7 @@ public class World
 
         bool xInBox = false;
         bool yInBox = false;
+        List<Box> enterBoxList = new List<Box>();
         foreach (var b in triggerList)
         {
             bool tmXInBox = false;
@@ -51,10 +52,14 @@ public class World
             tmXInBox = (box.CheckMoveBoxX(b, speed));
             tmYInBox = (box.CheckMoveBoxY(b, speed));
             if (tmXInBox || tmYInBox)
+            {
+                enterBoxList.Add(b);
                 box.MoveToPivotPos(b, box.pos + speed, speed);
+            }
             if (tmXInBox) xInBox = true;
             if (tmYInBox) yInBox = true;
         }
+        box.CheckEnterBox(enterBoxList);
         if (xInBox || yInBox)
         {
             if (xInBox)

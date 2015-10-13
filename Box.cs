@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 public enum Dir{
 none,up,down,left,right,
@@ -10,6 +11,7 @@ public class Box
 {
     const float IGNORE_RANGE = 0.0001f;
     public float mass = 1;
+    List<Box> enterBoxList = new List<Box>();
     public Vector2 pos;
     /// <summary>
     /// half width and height--
@@ -17,7 +19,7 @@ public class Box
     public float hwidth, hheight;
     public bool lockSpeedX = false;
     public bool lockSpeedY = false;
-    public Action<Box> otherBoxEnterCallback = null;
+
     public Vector2 speed
     {
         set
@@ -53,15 +55,18 @@ public class Box
         return this;
     }
 
-    //ToDo:-->
-    void OnOtherBoxEnter(Box other)
+
+    public virtual void OnOtherEnter(Box other)
     {
-        if (otherBoxEnterCallback != null)
-        {
-            otherBoxEnterCallback(other);
-        }
         Debug.Log("other box enter");
     }
+
+    public virtual void OnOtherExit(Box other)
+    {
+        Debug.Log("other box exit");
+    }
+
+
     #endregion
 
     #region function
@@ -136,6 +141,31 @@ public class Box
     #endregion
 
     #region calc
+    public void CheckEnterBox(List<Box> newEnterBoxList)
+    {
+        //calc
+        List<Box> oldEnterBoxList = this.enterBoxList;
+        List<Box> resultExitBoxList = new List<Box>();
+        List<Box> resultEnterBoxList = new List<Box>();
+        foreach (var b in oldEnterBoxList)
+        {
+            if (newEnterBoxList.Contains(b) == false)
+            {
+                resultEnterBoxList.Add(b);
+                b.OnOtherEnter(this);
+            }
+        }
+        foreach (var b in newEnterBoxList)
+        {
+            if (oldEnterBoxList.Contains(b) == false)
+            {
+                resultExitBoxList.Add(b);
+                b.OnOtherExit(this);
+            }
+        }
+        this.enterBoxList = newEnterBoxList;
+    }
+
     public bool CheckMoveBoxX(Box staticBox, Vector2 speed)
     {
         float xSpeed = speed.x;
