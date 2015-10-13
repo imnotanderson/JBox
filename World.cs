@@ -23,14 +23,14 @@ public class World
     {
         foreach (Box box in boxList)
         {
-            box.AddSpeed(-Vector2.up * g);
-            box.Move(deltaTime);   
+            box.ApplyForce(-Vector2.up * g);
+            box.Move(deltaTime);
         }
     }
     #endregion
 
     #region function
-    public void AddBox(Box box,bool isTrigger=false)
+    public void AddBox(Box box, bool isTrigger = false)
     {
         box.world = this;
         var list = isTrigger ? triggerList : boxList;
@@ -94,7 +94,7 @@ public class World
             box.Draw();
         }
         Gizmos.color = Color.green;
-        if(testBox!=null)
+        if (testBox != null)
         {
             testBox.Draw();
         }

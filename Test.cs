@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Test : MonoBehaviour {
+public class Test : MonoBehaviour
+{
 
     World world = null;
     Box testBox;
@@ -10,7 +11,7 @@ public class Test : MonoBehaviour {
         world = new World();
         world.AddBox(new Box(0.1f, 5, 1, 1));
         world.AddBox(new Box(0, -2, 50, 3), true);
-        testBox = new Box(0,0,2,2);
+        testBox = new Box(0, 0, 2, 2);
         world.testBox = testBox;
         world.AddBox(new Box(20, -9, 30, 1f), true);
         world.AddBox(new Box(35, -15, 30, 1f), true);
@@ -27,18 +28,26 @@ public class Test : MonoBehaviour {
     {
         if (world == null) return;
         world.Upt(Time.deltaTime);
-        if(Input.GetKey(KeyCode.W))TestMove(Vector2.up);
-        if(Input.GetKey(KeyCode.S))TestMove(-Vector2.up);
-        if(Input.GetKey(KeyCode.A))TestMove(-Vector2.right);
-        if(Input.GetKey(KeyCode.D))TestMove(Vector2.right);
-        
+        if (Input.GetKey(KeyCode.W)) TestMove(Vector2.up);
+        if (Input.GetKey(KeyCode.S)) TestMove(-Vector2.up);
+        if (Input.GetKey(KeyCode.A)) TestMove(-Vector2.right);
+        if (Input.GetKey(KeyCode.D)) TestMove(Vector2.right);
+
+        if (Input.GetKeyUp(KeyCode.Q)) ApplyForceTest();
+
+
+    }
+    public Vector2 force;
+    void ApplyForceTest()
+    {
+        world.BoxList[0].ApplyForce(force);
     }
 
     void TestMove(Vector2 speed)
     {
-        world.MoveBox(testBox,speed*Time.deltaTime);
+        world.MoveBox(testBox, speed * Time.deltaTime);
     }
-    
+
     void OnGUI()
     {
         if (world == null) return;
@@ -46,12 +55,11 @@ public class Test : MonoBehaviour {
         var b2 = world.TriggerList.Count > 0 ? world.TriggerList[0] : null;
         GUILayout.Label(string.Format("test:({0},{1})", testBox.pos.x, testBox.pos.y));
         GUILayout.Label(string.Format("b2:({0},{1})", b2.pos.x, b2.pos.y));
-        if(GUILayout.Button("Test"))
+        if (GUILayout.Button("Test"))
         {
             Box staticBox = world.TriggerList[0];
-            var pos = Box.GetPosInBoxLineByDir(staticBox.hwidth+testBox.hwidth,staticBox.hheight+testBox.hheight,staticBox.pos,testBox.pos-staticBox.pos);
-           testBox.pos = pos;
-           // testBox.GetPivotPos(world.triggerList[0],new Vector2(0,0),Vector2.right);
+            var pos = Box.GetPosInBoxLineByDir(staticBox.hwidth + testBox.hwidth, staticBox.hheight + testBox.hheight, staticBox.pos, testBox.pos - staticBox.pos);
+            testBox.pos = pos;
         }
     }
 }

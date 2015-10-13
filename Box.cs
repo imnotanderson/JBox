@@ -7,15 +7,17 @@ none,up,down,left,right,
 
 public class Box
 {
-	const float IGNORE_RANGE = 0.0001f;
-    public float mass = 0;
+    const float IGNORE_RANGE = 0.0001f;
+    public float mass = 1;
     public Vector2 pos;
     /// <summary>
     /// half width and height--
     /// </summary>
     public float hwidth, hheight;
     public Vector2 speed;
+    Vector2 addSpeed = Vector2.zero;
     public World world;
+
 
     #region life cycle
 
@@ -35,13 +37,14 @@ public class Box
     #endregion
 
     #region function
-
-    public void AddSpeed(Vector2 addSpeed)
+    void AddSpeed()
     {
         this.speed += addSpeed;
+        addSpeed = Vector2.zero;
     }
     public void Move(float stepTime)
     {
+        AddSpeed();
         world.MoveBox(this, speed * stepTime);
     }
     public void MoveToPivotPos(Box staticBox, Vector2 newPos, Vector2 moveDir)
@@ -85,8 +88,7 @@ public class Box
     public void ApplyForce(Vector2 force)
     {
         if (mass == 0) return;
-        Vector2 addSpeed = force / mass;
-        speed += addSpeed;
+        addSpeed += force / mass;
     }
     #endregion
 
@@ -188,7 +190,7 @@ public class Box
     }
     #endregion
 
-    #region debug   
+    #region debug
     public void Draw()
     {
         Vector2[] p = new Vector2[]{
