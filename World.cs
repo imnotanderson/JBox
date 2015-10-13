@@ -4,24 +4,32 @@ using System.Collections.Generic;
 
 
 
-public class World  {
-    
-    public Box testBox = null;
-    public List<Box> boxList = new List<Box>();
-    public List<Box> triggerList = new List<Box>();
+public class World
+{
 
+    #region debug
+    public Box testBox = null;
+    public List<Box> BoxList { get { return boxList; } }
+    public List<Box> TriggerList { get { return triggerList; } }
+    #endregion
+
+    List<Box> boxList = new List<Box>();
+    List<Box> triggerList = new List<Box>();
     float g = 1;
+
+    #region life cycle
 
     public void Upt(float deltaTime)
     {
         foreach (Box box in boxList)
         {
             box.AddSpeed(-Vector2.up * g);
-            box.speed.x = 10;
             box.Move(deltaTime);   
         }
     }
+    #endregion
 
+    #region function
     public void AddBox(Box box,bool isTrigger=false)
     {
         box.world = this;
@@ -29,6 +37,50 @@ public class World  {
         list.Add(box);
     }
 
+    public void MoveBox(Box box, Vector2 speed)
+    {
+        Vector2 xSpeed = new Vector2(speed.x, 0);
+        Vector2 ySpeed = new Vector2(0, speed.y);
+
+        bool xInBox = false;
+        bool yInBox = false;
+        foreach (var b in triggerList)
+        {
+            bool tmXInBox = false;
+            bool tmYInBox = false;
+            tmXInBox = (box.CheckMoveBoxX(b, speed));
+            tmYInBox = (box.CheckMoveBoxY(b, speed));
+            if (tmXInBox || tmYInBox)
+                box.MoveToPivotPos(b, box.pos + speed, speed);
+            if (tmXInBox) xInBox = true;
+            if (tmYInBox) yInBox = true;
+        }
+        if (xInBox || yInBox)
+        {
+            if (xInBox)
+            {
+                box.speed.x = 0;
+            }
+            else
+            {
+                box.pos.x += speed.x;
+            }
+            if (yInBox)
+            {
+                box.speed.y = 0;
+            }
+            else
+            {
+                box.pos.y += speed.y;
+            }
+            return;
+        }
+        box.pos += speed;
+    }
+
+    #endregion
+
+    #region debug
     public void Draw()
     {
         Gizmos.color = Color.white;
@@ -47,57 +99,6 @@ public class World  {
             testBox.Draw();
         }
     }
-
-    public void MoveBox(Box box, Vector2 speed)
-    {
-        Vector2 xSpeed = new Vector2(speed.x, 0);
-        Vector2 ySpeed = new Vector2(0, speed.y);
-        
-        bool xInBox = false;
-        bool yInBox = false;
-        foreach (var b in triggerList)
-        {
-            bool tmXInBox = false;
-            bool tmYInBox = false;
-            tmXInBox = (box.CheckMoveBoxX(b, speed));
-            tmYInBox = (box.CheckMoveBoxY(b, speed));
-            if(tmXInBox || tmYInBox)
-            box.GetPivotPos(b, box.pos + speed, speed);
-            if(tmXInBox)xInBox = true;
-            if(tmYInBox)yInBox = true;
-        }
-        if (xInBox || yInBox)
-        {
-            if (xInBox)
-            {
-                box.speed.x = 0;
-            }
-            else
-            {
-                box.pos.x+=speed.x;
-            }
-            if (yInBox)
-            {
-                box.speed.y = 0;
-            }
-            else
-            {
-                box.pos.y+=speed.y;
-            }
-            return;
-        }
-        box.pos += speed;
-
-    }
-
-    public void MoveBoxX()
-    { 
-    
-    }
-
-    public void MoveBoxY()
-    { 
-        
-    }
+    #endregion
 
 }

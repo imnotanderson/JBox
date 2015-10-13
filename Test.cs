@@ -42,13 +42,13 @@ public class Test : MonoBehaviour {
     void OnGUI()
     {
         if (world == null) return;
-        var b1 = world.boxList.Count > 0 ? world.boxList[0] : null;
-        var b2 = world.triggerList.Count > 0 ? world.triggerList[0] : null;
+        var b1 = world.BoxList.Count > 0 ? world.BoxList[0] : null;
+        var b2 = world.TriggerList.Count > 0 ? world.TriggerList[0] : null;
         GUILayout.Label(string.Format("test:({0},{1})", testBox.pos.x, testBox.pos.y));
         GUILayout.Label(string.Format("b2:({0},{1})", b2.pos.x, b2.pos.y));
         if(GUILayout.Button("Test"))
         {
-            Box staticBox = world.triggerList[0];
+            Box staticBox = world.TriggerList[0];
             var pos = Box.GetPosInBoxLineByDir(staticBox.hwidth+testBox.hwidth,staticBox.hheight+testBox.hheight,staticBox.pos,testBox.pos-staticBox.pos);
            testBox.pos = pos;
            // testBox.GetPivotPos(world.triggerList[0],new Vector2(0,0),Vector2.right);
