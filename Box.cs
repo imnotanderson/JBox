@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System;
 
 public enum Dir{
 none,up,down,left,right,
@@ -16,7 +17,7 @@ public class Box
     public float hwidth, hheight;
     public bool lockSpeedX = false;
     public bool lockSpeedY = false;
-
+    public Action<Box> otherBoxEnterCallback = null;
     public Vector2 speed
     {
         set
@@ -52,6 +53,15 @@ public class Box
         return this;
     }
 
+    //ToDo:-->
+    void OnOtherBoxEnter(Box other)
+    {
+        if (otherBoxEnterCallback != null)
+        {
+            otherBoxEnterCallback(other);
+        }
+        Debug.Log("other box enter");
+    }
     #endregion
 
     #region function
