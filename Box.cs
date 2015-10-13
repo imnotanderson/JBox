@@ -14,7 +14,24 @@ public class Box
     /// half width and height--
     /// </summary>
     public float hwidth, hheight;
-    public Vector2 speed;
+    public bool lockSpeedX = false;
+    public bool lockSpeedY = false;
+
+    public Vector2 speed
+    {
+        set
+        {
+            var oldVal = _speed;
+            _speed = value;
+            if (lockSpeedX) _speed.x = oldVal.y;
+            if (lockSpeedY) _speed.y = oldVal.y;
+        }
+        get
+        {
+            return _speed;
+        }
+    }
+    Vector2 _speed;
     Vector2 addSpeed = Vector2.zero;
     public World world;
 
@@ -34,6 +51,7 @@ public class Box
         this.mass = mass;
         return this;
     }
+
     #endregion
 
     #region function
