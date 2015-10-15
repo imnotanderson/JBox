@@ -2,6 +2,7 @@
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using UnityEditor;
 
 public enum Dir{
 none,up,down,left,right,
@@ -9,6 +10,7 @@ none,up,down,left,right,
 
 public class Box
 {
+    string name = "";
     const float IGNORE_RANGE = 0.0001f;
     public float mass = 1;
     List<Box> enterBoxList = new List<Box>();
@@ -25,9 +27,9 @@ public class Box
         set
         {
             var oldVal = _speed;
+            if (lockSpeedX) value.x = oldVal.x;
+            if (lockSpeedY) value.y = oldVal.y;
             _speed = value;
-            if (lockSpeedX) _speed.x = oldVal.y;
-            if (lockSpeedY) _speed.y = oldVal.y;
         }
         get
         {
@@ -41,8 +43,9 @@ public class Box
 
     #region life cycle
 
-    public Box(float x, float y, float width, float height)
+    public Box(float x, float y, float width, float height,string name="")
     {
+        this.name = name;
         this.pos = new Vector2(x, y);
         this.hwidth = width / 2f;
         this.hheight = height / 2f;
@@ -58,12 +61,12 @@ public class Box
 
     public virtual void OnOtherEnter(Box other)
     {
-        Debug.Log("other box enter");
+        Debug.Log(string.Format("{0} enter {1}",other.name,name));
     }
 
     public virtual void OnOtherExit(Box other)
     {
-        Debug.Log("other box exit");
+        Debug.Log(string.Format("{0} exit {1}", other.name, name));
     }
 
 
@@ -152,7 +155,7 @@ public class Box
             if (newEnterBoxList.Contains(b) == false)
             {
                 resultEnterBoxList.Add(b);
-                b.OnOtherEnter(this);
+                b.OnOtherExit(this);
             }
         }
         foreach (var b in newEnterBoxList)
@@ -160,7 +163,7 @@ public class Box
             if (oldEnterBoxList.Contains(b) == false)
             {
                 resultExitBoxList.Add(b);
-                b.OnOtherExit(this);
+                b.OnOtherEnter(this);
             }
         }
         this.enterBoxList = newEnterBoxList;
@@ -275,6 +278,7 @@ public class Box
         {
             Gizmos.DrawLine(p[i], p[i + 1]);
         }
+        Handles.Label(pos, name);
     }
     #endregion
 }

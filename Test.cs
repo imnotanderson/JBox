@@ -9,13 +9,16 @@ public class Test : MonoBehaviour
     void Start()
     {
         world = new World();
-        world.AddBox(new Box(0.1f, 5, 1, 1));
-        world.AddBox(new Box(0, -2, 50, 3), true);
-        testBox = new Box(0, 0, 2, 2);
+        var box = new Box(0.1f, 5, 1, 1, "1");
+        box.SetXSpeed(2);
+        box.lockSpeedX = true;
+        world.AddBox(box);
+        world.AddBox(new Box(0, -2, 50, 3, "2"), true);
+        testBox = new Box(0, 0, 2, 2, "3");
         world.testBox = testBox;
-        world.AddBox(new Box(20, -9, 30, 1f), true);
-        world.AddBox(new Box(35, -15, 30, 1f), true);
-        world.AddBox(new Box(40, -9, 1, 13), true);
+        world.AddBox(new Box(20, -9, 30, 1f, "4"), true);
+        world.AddBox(new Box(35, -15, 30, 1f, "5"), true);
+        world.AddBox(new Box(40, -9, 1, 13, "6"), true);
     }
 
     public void OnDrawGizmos()
