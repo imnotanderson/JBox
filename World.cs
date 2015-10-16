@@ -68,7 +68,8 @@ public class World
             }
             else
             {
-                box.pos.x += speed.x;
+
+                box.SetPosXAdd(speed.x);
             }
             if (yInBox)
             {
@@ -76,7 +77,7 @@ public class World
             }
             else
             {
-                box.pos.y += speed.y;
+                box.SetPosYAdd(speed.y);
             }
             return;
         }

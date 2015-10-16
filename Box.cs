@@ -4,8 +4,9 @@ using System;
 using System.Collections.Generic;
 using UnityEditor;
 
-public enum Dir{
-none,up,down,left,right,
+public enum Dir
+{
+    none, up, down, left, right,
 }
 
 public class Box
@@ -14,14 +15,26 @@ public class Box
     const float IGNORE_RANGE = 0.0001f;
     public float mass = 1;
     List<Box> enterBoxList = new List<Box>();
-    public Vector2 pos;
+    public Vector2 pos
+    {
+        set
+        {
+            _pos = value;
+            if (onPosChange != null)
+                onPosChange(_pos);
+        }
+        get { return this._pos; }
+    }
+    Vector2 _pos;
     /// <summary>
     /// half width and height--
     /// </summary>
     public float hwidth, hheight;
     public bool lockSpeedX = false;
     public bool lockSpeedY = false;
-
+    Action<Box> onOtherBoxEnter;
+    Action<Box> onOtherBoxExit;
+    Action<Vector2> onPosChange;
     public Vector2 speed
     {
         set
@@ -43,7 +56,7 @@ public class Box
 
     #region life cycle
 
-    public Box(float x, float y, float width, float height,string name="")
+    public Box(float x, float y, float width, float height, string name = "")
     {
         this.name = name;
         this.pos = new Vector2(x, y);
@@ -58,21 +71,69 @@ public class Box
         return this;
     }
 
+    public Box SetOtherBoxEnterCallback(Action<Box> callback)
+    {
+        this.onOtherBoxEnter = callback;
+        return this;
+    }
 
+    public Box SetOtherBoxExitCallback(Action<Box> callback)
+    {
+        this.onOtherBoxExit = callback;
+        return this;
+    }
+
+    public Box SetOnPosChange(Action<Vector2> onPosChange)
+    {
+        this.onPosChange = onPosChange;
+        return this;
+    }
     public virtual void OnOtherEnter(Box other)
     {
-        Debug.Log(string.Format("{0} enter {1}",other.name,name));
+        Debug.Log(string.Format("{0} enter {1}", other.name, name));
+        if (onOtherBoxEnter != null)
+            onOtherBoxEnter(this);
     }
 
     public virtual void OnOtherExit(Box other)
     {
         Debug.Log(string.Format("{0} exit {1}", other.name, name));
+        if (onOtherBoxExit != null)
+            onOtherBoxExit(this);
     }
 
 
     #endregion
 
     #region function
+    public void SetPosX(float x)
+    {
+        var pos = this.pos;
+        pos.x = x;
+        this.pos = pos;
+    }
+
+    public void SetPosXAdd(float x)
+    {
+        var pos = this.pos;
+        pos.x += x;
+        this.pos = pos;
+    }
+
+    public void SetPosYAdd(float y)
+    {
+        var pos = this.pos;
+        pos.y += y;
+        this.pos = pos;
+    }
+
+    public void SetPosY(float y)
+    {
+        var pos = this.pos;
+        pos.y = y;
+        this.pos = pos;
+    }
+
     void AddSpeed()
     {
         this.speed += addSpeed;
@@ -272,7 +333,7 @@ public class Box
         Vector2[] p = new Vector2[]{
             pos+new Vector2(-hwidth,hheight),pos+new Vector2(hwidth,hheight),
             pos+new Vector2(hwidth,-hheight), pos+new Vector2(-hwidth,-hheight),
-            pos+new Vector2(-hwidth,hheight)        
+            pos+new Vector2(-hwidth,hheight)
         };
         for (int i = 0; i < 4; i++)
         {
