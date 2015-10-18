@@ -12,8 +12,9 @@ public enum Dir
 public class Box
 {
 	public object data;
-    string name = "";
-    const float IGNORE_RANGE = 0.0001f;
+    public string name = "";
+    const float IGNORE_RANGE = 0f;
+	const float ON_BOX_CHECK_PARAM = 0.01f;
     public float mass = 1;
     List<Box> enterBoxList = new List<Box>();
     public Vector2 pos
@@ -143,38 +144,7 @@ public class Box
         AddSpeed();
         world.MoveBox(this, speed * stepTime);
     }
-    public void MoveToPivotPos(Box staticBox, Vector2 newPos, Vector2 moveDir)
-    {
-        pos = newPos;
-        float h = this.hheight + staticBox.hheight;
-        float w = this.hwidth + staticBox.hwidth;
-        Vector2 ravPos = this.pos - staticBox.pos;
-        Vector2[] p = new Vector2[0];
-        var dir = -moveDir;
-        if (dir.x != 0)
-        {
-            float k = dir.y / dir.x;
-            float c = -ravPos.x * k + ravPos.y;
-            p = new Vector2[]
-            {
-                new Vector2(-w,k*-w+c),new Vector2(w,k*w+c),
-                new Vector2((h-c)/k,h),new Vector2((-h-c)/k,-h)
-            };
-        }
-        else
-        {
-            ravPos.y = ravPos.y > 0 ? h : -h;
-            pos = staticBox.pos + ravPos;
-        }
-        foreach (var v in p)
-        {
-            if (CheckPointInRayAndBox(ravPos, dir, w, h, v))
-            {
-                pos = staticBox.pos + v;
-                return;
-            }
-        }
-    }
+    
     public Box Clone()
     {
         Box cloneBox = new Box(pos.x, pos.y, hwidth * 2, hheight * 2);
@@ -204,6 +174,41 @@ public class Box
     #endregion
 
     #region calc
+    public void MoveToPivotPos(Box staticBox, Vector2 newPos, Vector2 moveDir)
+    {
+        pos = newPos;
+        float h = this.hheight + staticBox.hheight;
+        float w = this.hwidth + staticBox.hwidth;
+        Vector2 ravPos = this.pos - staticBox.pos;
+        Vector2[] p = new Vector2[0];
+        var dir = -moveDir;
+        if (dir.x != 0)
+        {
+            float k = dir.y / dir.x;
+            float c = -ravPos.x * k + ravPos.y;
+            p = new Vector2[]
+            {
+                new Vector2(-w,k*-w+c),new Vector2(w,k*w+c),
+                new Vector2((h-c)/k,h),new Vector2((-h-c)/k,-h)
+            };
+        }
+        else
+        {
+            ravPos.y = ravPos.y > 0 ? h : -h;
+            pos = staticBox.pos + ravPos;
+        }
+        foreach (var v in p)
+        {
+            if (CheckPointInRayAndBox(ravPos, dir, w, h, v))
+            {
+                pos = staticBox.pos + v;
+				pos += moveDir.normalized * IGNORE_RANGE*1f;
+                return;
+            }
+        }
+		//pos += moveDir.normalized * 0.001f;
+    }
+    
     public void CheckEnterBox(List<Box> newEnterBoxList)
     {
         //calc
@@ -229,27 +234,26 @@ public class Box
         this.enterBoxList = newEnterBoxList;
     }
 
-    public bool CheckMoveBoxX(Box staticBox, Vector2 speed)
+	public enum BoxCheckResult
+	{
+		OutBox,OnBox,InBox
+	}
+
+	//return 3 state: out box need move,on box dont need pupop, in box need pipop
+	public BoxCheckResult CheckMoveBoxX(Box staticBox, Vector2 speed)
     {
         float xSpeed = speed.x;
         var newPos = pos + new Vector2(xSpeed, 0);
-        bool isInStaticBox = NewPosInStaticBox(newPos, staticBox);
-        if (isInStaticBox)
-        {
-            return true;
-        }
-        return false;
+        BoxCheckResult checkResult = NewPosInStaticBox(newPos, staticBox);
+
+		return checkResult;
     }
-    public bool CheckMoveBoxY(Box staticBox, Vector2 speed)
+	public BoxCheckResult CheckMoveBoxY(Box staticBox, Vector2 speed)
     {
         float ySpeed = speed.y;
         var newPos = pos + new Vector2(0, ySpeed);
-        bool isInStaticBox = NewPosInStaticBox(newPos, staticBox);
-        if (isInStaticBox)
-        {
-            return true;
-        }
-        return false;
+		BoxCheckResult checkResult = NewPosInStaticBox(newPos, staticBox);
+		return checkResult;
     }
     bool CheckPointInRayAndBox(Vector2 rayPoint, Vector2 rayDir, float boxHWidth, float boxHHeight, Vector2 point)
     {
@@ -284,9 +288,9 @@ public class Box
         return result;
     }
 
-    bool NewPosInStaticBox(Vector2 newPos, Box staticBox)
+    BoxCheckResult NewPosInStaticBox(Vector2 newPos, Box staticBox)
     {
-        bool isInStaticBox = false;
+        BoxCheckResult result;
         float newMinY = newPos.y - this.hheight;
         float newMaxY = newPos.y + this.hheight;
         float staticMinY = staticBox.pos.y - staticBox.hheight;
@@ -296,16 +300,19 @@ public class Box
         float newMaxX = newPos.x + this.hwidth;
         float staticMinX = staticBox.pos.x - staticBox.hwidth;
         float staticMaxX = staticBox.pos.x + staticBox.hwidth;
-        if ((newMinY > staticMaxY - IGNORE_RANGE || newMaxY - IGNORE_RANGE < staticMinY) ||
-            (newMinX > staticMaxX - IGNORE_RANGE || newMaxX - IGNORE_RANGE < staticMinX))
-        {
-            isInStaticBox = false;
-        }
+        if ((newMinY > staticMaxY || newMaxY < staticMinY) ||
+			(newMinX > staticMaxX || newMaxX < staticMinX)) {
+			result = BoxCheckResult.OutBox;
+		} else if ((newMinY > staticMaxY - ON_BOX_CHECK_PARAM || newMaxY < staticMinY+ON_BOX_CHECK_PARAM) ||
+			(newMinX > staticMaxX - ON_BOX_CHECK_PARAM || newMaxX < staticMinX + ON_BOX_CHECK_PARAM)) 
+		{
+			result = BoxCheckResult.OnBox;
+		}
         else
         {
-            isInStaticBox = true;
+            result = BoxCheckResult.InBox;
         }
-        return isInStaticBox;
+        return result;
     }
 
     public bool PointInBox(Vector2 p)

@@ -3,22 +3,29 @@ using System.Collections;
 
 public class Test : MonoBehaviour
 {
-
+	public float testSpeed = 10;
     World world = null;
     Box testBox;
     void Start()
     {
         world = new World();
-        var box = new Box(0.1f, 5, 1, 1, "1");
+        var box = new Box(0, 5, 1, 1, "test");
         box.SetXSpeed(2);
-        box.lockSpeedX = true;
-        world.AddBox(box);
-        world.AddBox(new Box(0, -2, 50, 3, "2"), true);
-        testBox = new Box(0, 0, 2, 2, "3");
-        world.testBox = testBox;
-        world.AddBox(new Box(20, -9, 30, 1f, "4"), true);
-        world.AddBox(new Box(35, -15, 30, 1f, "5"), true);
-        world.AddBox(new Box(40, -9, 1, 13, "6"), true);
+		box.SetEnterOtherBoxCallback ((b) => {
+			Debug.Log("Enter "+b.name);
+		});
+		world.AddBox (box);
+//        box.lockSpeedX = true;
+		for (int i = 0; i<10; i++) {
+			world.AddBox(new Box(0+i, 0, 1, 1, "hitTest"+i), true);
+		}
+//		world.AddBox(box);
+//        world.AddBox(new Box(0, -2, 50, 3, "2"), true);
+//        testBox = new Box(0, 0, 2, 2, "3");
+//        world.testBox = testBox;
+//        world.AddBox(new Box(5, 0, 3, 3, "4"), true);
+//        world.AddBox(new Box(35, -15, 30, 1f, "5"), true);
+//        world.AddBox(new Box(40, -9, 1, 13, "6"), true);
     }
 
     public void OnDrawGizmos()
@@ -48,7 +55,7 @@ public class Test : MonoBehaviour
 
     void TestMove(Vector2 speed)
     {
-        world.MoveBox(testBox, speed * Time.deltaTime);
+		world.MoveBox(testBox, testSpeed* speed * Time.deltaTime);
     }
 
     void OnGUI()
@@ -56,7 +63,7 @@ public class Test : MonoBehaviour
         if (world == null) return;
         var b1 = world.BoxList.Count > 0 ? world.BoxList[0] : null;
         var b2 = world.TriggerList.Count > 0 ? world.TriggerList[0] : null;
-        GUILayout.Label(string.Format("test:({0},{1})", testBox.pos.x, testBox.pos.y));
+//        GUILayout.Label(string.Format("test:({0},{1})", testBox.pos.x, testBox.pos.y));
         GUILayout.Label(string.Format("b2:({0},{1})", b2.pos.x, b2.pos.y));
         if (GUILayout.Button("Test"))
         {

@@ -47,17 +47,20 @@ public class World
         List<Box> enterBoxList = new List<Box>();
         foreach (var b in triggerList)
         {
-            bool tmXInBox = false;
-            bool tmYInBox = false;
-            tmXInBox = (box.CheckMoveBoxX(b, speed));
-            tmYInBox = (box.CheckMoveBoxY(b, speed));
-            if (tmXInBox || tmYInBox)
+            Box.BoxCheckResult tmXInBoxCheck ;
+            Box.BoxCheckResult tmYInBoxCheck ;
+            tmXInBoxCheck = (box.CheckMoveBoxX(b, speed));
+            tmYInBoxCheck = (box.CheckMoveBoxY(b, speed));
+            if (tmXInBoxCheck != Box.BoxCheckResult.OutBox || tmYInBoxCheck != Box.BoxCheckResult.OutBox)
             {
                 enterBoxList.Add(b);
-                box.MoveToPivotPos(b, box.pos + speed, speed);
             }
-            if (tmXInBox) xInBox = true;
-            if (tmYInBox) yInBox = true;
+			if (tmXInBoxCheck == Box.BoxCheckResult.InBox || tmYInBoxCheck == Box.BoxCheckResult.InBox)
+			{
+				box.MoveToPivotPos(b, box.pos + speed, speed);
+			}
+			if (tmXInBoxCheck== Box.BoxCheckResult.InBox) xInBox = true;
+            if (tmYInBoxCheck== Box.BoxCheckResult.InBox) yInBox = true;
         }
         box.CheckEnterBox(enterBoxList);
         if (xInBox || yInBox)
