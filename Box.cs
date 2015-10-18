@@ -11,6 +11,7 @@ public enum Dir
 
 public class Box
 {
+	public object data;
     string name = "";
     const float IGNORE_RANGE = 0.0001f;
     public float mass = 1;
@@ -32,8 +33,8 @@ public class Box
     public float hwidth, hheight;
     public bool lockSpeedX = false;
     public bool lockSpeedY = false;
-    Action<Box> onOtherBoxEnter;
-    Action<Box> onOtherBoxExit;
+    Action<Box> onEnterOtherBox;
+    Action<Box> onExitOtherBox;
     Action<Vector2> onPosChange;
     public Vector2 speed
     {
@@ -71,15 +72,15 @@ public class Box
         return this;
     }
 
-    public Box SetOtherBoxEnterCallback(Action<Box> callback)
+    public Box SetEnterOtherBoxCallback(Action<Box> callback)
     {
-        this.onOtherBoxEnter = callback;
+        this.onEnterOtherBox = callback;
         return this;
     }
 
-    public Box SetOtherBoxExitCallback(Action<Box> callback)
+    public Box SetExitOtherBoxCallback(Action<Box> callback)
     {
-        this.onOtherBoxExit = callback;
+        this.onExitOtherBox = callback;
         return this;
     }
 
@@ -88,18 +89,16 @@ public class Box
         this.onPosChange = onPosChange;
         return this;
     }
-    public virtual void OnOtherEnter(Box other)
+    public virtual void OnEnterOther(Box other)
     {
-        Debug.Log(string.Format("{0} enter {1}", other.name, name));
-        if (onOtherBoxEnter != null)
-            onOtherBoxEnter(this);
+        if (onEnterOtherBox != null)
+            onEnterOtherBox(other);
     }
 
-    public virtual void OnOtherExit(Box other)
+    public virtual void OnExitOther(Box other)
     {
-        Debug.Log(string.Format("{0} exit {1}", other.name, name));
-        if (onOtherBoxExit != null)
-            onOtherBoxExit(this);
+        if (onExitOtherBox != null)
+            onExitOtherBox(other);
     }
 
 
@@ -216,7 +215,7 @@ public class Box
             if (newEnterBoxList.Contains(b) == false)
             {
                 resultEnterBoxList.Add(b);
-                b.OnOtherExit(this);
+                this.OnExitOther(b);
             }
         }
         foreach (var b in newEnterBoxList)
@@ -224,7 +223,7 @@ public class Box
             if (oldEnterBoxList.Contains(b) == false)
             {
                 resultExitBoxList.Add(b);
-                b.OnOtherEnter(this);
+                this.OnEnterOther(b);
             }
         }
         this.enterBoxList = newEnterBoxList;
