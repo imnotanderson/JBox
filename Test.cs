@@ -10,14 +10,19 @@ public class Test : MonoBehaviour
     {
         world = new World();
         var box = new Box(0, 5, 1, 1, "test");
-        box.SetXSpeed(2);
+        //box.SetXSpeed(2);
 		box.SetEnterOtherBoxCallback ((b) => {
 			Debug.Log("Enter "+b.name);
 		});
+        box.SetExitOtherBoxCallback((b) =>
+        {
+            Debug.Log("Exit " + b.name);
+        }); 
+        testBox = box;
 		world.AddBox (box);
 //        box.lockSpeedX = true;
-		for (int i = 0; i<10; i++) {
-			world.AddBox(new Box(0+i, 0, 1, 1, "hitTest"+i), true);
+		for (int i = 0; i<100; i++) {
+			world.AddBox(new Box(0+i, 0, 1, 1, ""+i), true);
 		}
 //		world.AddBox(box);
 //        world.AddBox(new Box(0, -2, 50, 3, "2"), true);
@@ -36,6 +41,7 @@ public class Test : MonoBehaviour
 
     void Update()
     {
+        testBox.SetXSpeed(testBox.speed.x + 0.1f);
         if (world == null) return;
         world.Upt(Time.deltaTime);
         if (Input.GetKey(KeyCode.W)) TestMove(Vector2.up);
@@ -60,6 +66,7 @@ public class Test : MonoBehaviour
 
     void OnGUI()
     {
+        GUILayout.Label(testBox.speed.x.ToString());
         if (world == null) return;
         var b1 = world.BoxList.Count > 0 ? world.BoxList[0] : null;
         var b2 = world.TriggerList.Count > 0 ? world.TriggerList[0] : null;

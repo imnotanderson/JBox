@@ -49,16 +49,41 @@ public class World
         {
             Box.BoxCheckResult tmXInBoxCheck ;
             Box.BoxCheckResult tmYInBoxCheck ;
-            tmXInBoxCheck = (box.CheckMoveBoxX(b, speed));
-            tmYInBoxCheck = (box.CheckMoveBoxY(b, speed));
-            if (tmXInBoxCheck != Box.BoxCheckResult.OutBox || tmYInBoxCheck != Box.BoxCheckResult.OutBox)
+            tmXInBoxCheck = (box.CheckMoveBoxX(b, xSpeed));
+            tmYInBoxCheck = (box.CheckMoveBoxY(b, ySpeed));
+            if (tmXInBoxCheck == Box.BoxCheckResult.OutBox && tmYInBoxCheck == Box.BoxCheckResult.OutBox)
+            {
+                //enterBoxList.Add(b);
+            }
+            else if (tmXInBoxCheck == Box.BoxCheckResult.InBox || tmYInBoxCheck == Box.BoxCheckResult.InBox)
+            {
+                var oldPos = box.pos;
+                if (tmXInBoxCheck == Box.BoxCheckResult.InBox)
+                {
+                    tmXInBoxCheck = (box.CheckMoveBoxX(b, xSpeed));
+                    var tmPos = box.pos;
+                    box.MoveToPivotPos(b, oldPos + xSpeed, speed);
+                    tmPos.x = box.pos.x;
+                    box.pos = tmPos;
+                }
+                if (tmYInBoxCheck == Box.BoxCheckResult.InBox)
+                {
+                    var tmPos = box.pos;
+                    box.MoveToPivotPos(b, oldPos + ySpeed, speed);
+                    tmPos.y = box.pos.y;
+                    if (tmPos.y < 1)
+                    {
+                        //here <1 when bug
+                        box.MoveToPivotPos(b, oldPos + ySpeed, speed);
+                    }
+                    box.pos = tmPos;
+                }
+                enterBoxList.Add(b);
+            }
+            else
             {
                 enterBoxList.Add(b);
             }
-			if (tmXInBoxCheck == Box.BoxCheckResult.InBox || tmYInBoxCheck == Box.BoxCheckResult.InBox)
-			{
-				box.MoveToPivotPos(b, box.pos + speed, speed);
-			}
 			if (tmXInBoxCheck== Box.BoxCheckResult.InBox) xInBox = true;
             if (tmYInBoxCheck== Box.BoxCheckResult.InBox) yInBox = true;
         }
