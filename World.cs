@@ -70,7 +70,7 @@ public class World
                 {
                     var tmPos = box.pos;
                     box.MoveToPivotPos(b, oldPos + ySpeed, speed);
-                    tmPos.y = box.pos.y;
+                    tmPos.y = Mathf.RoundToInt( box.pos.y);
                     if (tmPos.y < 1)
                     {
                         //here <1 when bug
