@@ -15,7 +15,7 @@ public class World
 
     List<Box> boxList = new List<Box>();
     List<Box> triggerList = new List<Box>();
-    float g = 1;
+    float g = 1.3f;
 
     #region life cycle
 
@@ -70,7 +70,7 @@ public class World
                 {
                     var tmPos = box.pos;
                     box.MoveToPivotPos(b, oldPos + ySpeed, speed);
-                    tmPos.y = Mathf.RoundToInt( box.pos.y);
+//                    tmPos.y = Mathf.RoundToInt( box.pos.y);
                     if (tmPos.y < 1)
                     {
                         //here <1 when bug
