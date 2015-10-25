@@ -2,8 +2,9 @@
 using System.Collections;
 using System;
 using System.Collections.Generic;
+#if UNITY_EDITOR
 using UnityEditor;
-
+#endif
 public enum Dir
 {
     none, up, down, left, right,
@@ -397,6 +398,7 @@ public class Box
     #region debug
     public void Draw()
     {
+#if UNITY_EDITOR
         Vector2[] p = new Vector2[]{
             pos+new Vector2(-hwidth,hheight),pos+new Vector2(hwidth,hheight),
             pos+new Vector2(hwidth,-hheight), pos+new Vector2(-hwidth,-hheight),
@@ -407,6 +409,7 @@ public class Box
             Gizmos.DrawLine(p[i], p[i + 1]);
         }
         Handles.Label(pos, name);
+#endif
     }
     #endregion
 }
