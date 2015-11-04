@@ -21,12 +21,28 @@ public class World
 
     public void Upt(float deltaTime)
     {
-        foreach (Box box in boxList)
-        {
-            box.ApplyForce(-Vector2.up * g);
-            box.Move(deltaTime);
-        }
+		CalcForce (deltaTime);
+		CalcSpeed (deltaTime);
+		CalcPosition (deltaTime);
+//        foreach (Box box in boxList)
+//        {
+//            box.ApplyForce(-Vector2.up * g);
+//            box.Move(deltaTime);
+//        }
     }
+    
+	void CalcForce(float deltaTime){
+		
+	}
+
+	void CalcSpeed(float deltaTim){
+
+	}
+
+	void CalcPosition(float deltaTim){
+
+	}
+    
     #endregion
 
     #region function
