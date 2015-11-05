@@ -2,8 +2,9 @@
 using System.Collections;
 using System;
 using System.Collections.Generic;
+#if UNITY_EDITOR
 using UnityEditor;
-
+#endif
 public enum Dir
 {
     none, up, down, left, right,
@@ -14,8 +15,9 @@ public class Box
 	public object data;
     public string name = "";
     const float IGNORE_RANGE = 0f;
-	const float ON_BOX_CHECK_PARAM = 0.01f;
+	const float ON_BOX_CHECK_PARAM = 0.02f;
     public float mass = 1;
+	public Vector2 force = Vector2.zero;
     List<Box> enterBoxList = new List<Box>();
     public Vector2 pos
     {
@@ -153,8 +155,7 @@ public class Box
 
     public void ApplyForce(Vector2 force)
     {
-        if (mass == 0) return;
-        addSpeed += force / mass;
+		this.force += force;
     }
 
     public void SetXSpeed(float x)
@@ -288,6 +289,63 @@ public class Box
         return result;
     }
 
+    BoxCheckResult NewPosInStaticBoxX(Vector2 newPos, Box staticBox)
+    {
+        BoxCheckResult result;
+        float newMinY = newPos.y - this.hheight;
+        float newMaxY = newPos.y + this.hheight;
+        float staticMinY = staticBox.pos.y - staticBox.hheight;
+        float staticMaxY = staticBox.pos.y + staticBox.hheight;
+
+        float newMinX = newPos.x - this.hwidth;
+        float newMaxX = newPos.x + this.hwidth;
+        float staticMinX = staticBox.pos.x - staticBox.hwidth;
+        float staticMaxX = staticBox.pos.x + staticBox.hwidth;
+                   //up                     //down
+        if (
+                    //right                 //left
+			(newMinX > staticMaxX || newMaxX < staticMinX)) {
+			result = BoxCheckResult.OutBox;
+		} else if (
+			(newMinX > staticMaxX - ON_BOX_CHECK_PARAM || newMaxX < staticMinX + ON_BOX_CHECK_PARAM)) 
+		{
+			result = BoxCheckResult.OnBox;
+		}
+        else
+        {
+            result = BoxCheckResult.InBox;
+        }
+        return result;
+    }
+
+    BoxCheckResult NewPosInStaticBoxY(Vector2 newPos, Box staticBox)
+    {
+        BoxCheckResult result;
+        float newMinY = newPos.y - this.hheight;
+        float newMaxY = newPos.y + this.hheight;
+        float staticMinY = staticBox.pos.y - staticBox.hheight;
+        float staticMaxY = staticBox.pos.y + staticBox.hheight;
+
+        float newMinX = newPos.x - this.hwidth;
+        float newMaxX = newPos.x + this.hwidth;
+        float staticMinX = staticBox.pos.x - staticBox.hwidth;
+        float staticMaxX = staticBox.pos.x + staticBox.hwidth;
+        //up                     //down
+        if ((newMinY > staticMaxY || newMaxY < staticMinY))
+        {
+            result = BoxCheckResult.OutBox;
+        }
+        else if ((newMinY > staticMaxY - ON_BOX_CHECK_PARAM || newMaxY < staticMinY + ON_BOX_CHECK_PARAM) )
+        {
+            result = BoxCheckResult.OnBox;
+        }
+        else
+        {
+            result = BoxCheckResult.InBox;
+        }
+        return result;
+    }
+
     BoxCheckResult NewPosInStaticBox(Vector2 newPos, Box staticBox)
     {
         BoxCheckResult result;
@@ -300,14 +358,18 @@ public class Box
         float newMaxX = newPos.x + this.hwidth;
         float staticMinX = staticBox.pos.x - staticBox.hwidth;
         float staticMaxX = staticBox.pos.x + staticBox.hwidth;
+        //up                     //down
         if ((newMinY > staticMaxY || newMaxY < staticMinY) ||
-			(newMinX > staticMaxX || newMaxX < staticMinX)) {
-			result = BoxCheckResult.OutBox;
-		} else if ((newMinY > staticMaxY - ON_BOX_CHECK_PARAM || newMaxY < staticMinY+ON_BOX_CHECK_PARAM) ||
-			(newMinX > staticMaxX - ON_BOX_CHECK_PARAM || newMaxX < staticMinX + ON_BOX_CHECK_PARAM)) 
-		{
-			result = BoxCheckResult.OnBox;
-		}
+            //right                 //left
+            (newMinX > staticMaxX || newMaxX < staticMinX))
+        {
+            result = BoxCheckResult.OutBox;
+        }
+        else if ((newMinY > staticMaxY - ON_BOX_CHECK_PARAM || newMaxY < staticMinY + ON_BOX_CHECK_PARAM) ||
+          (newMinX > staticMaxX - ON_BOX_CHECK_PARAM || newMaxX < staticMinX + ON_BOX_CHECK_PARAM))
+        {
+            result = BoxCheckResult.OnBox;
+        }
         else
         {
             result = BoxCheckResult.InBox;
@@ -336,6 +398,7 @@ public class Box
     #region debug
     public void Draw()
     {
+#if UNITY_EDITOR
         Vector2[] p = new Vector2[]{
             pos+new Vector2(-hwidth,hheight),pos+new Vector2(hwidth,hheight),
             pos+new Vector2(hwidth,-hheight), pos+new Vector2(-hwidth,-hheight),
@@ -346,6 +409,7 @@ public class Box
             Gizmos.DrawLine(p[i], p[i + 1]);
         }
         Handles.Label(pos, name);
+#endif
     }
     #endregion
 }
