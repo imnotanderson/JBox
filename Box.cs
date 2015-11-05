@@ -17,6 +17,7 @@ public class Box
     const float IGNORE_RANGE = 0f;
 	const float ON_BOX_CHECK_PARAM = 0.02f;
     public float mass = 1;
+	public Vector2 force = Vector2.zero;
     List<Box> enterBoxList = new List<Box>();
     public Vector2 pos
     {
@@ -154,8 +155,7 @@ public class Box
 
     public void ApplyForce(Vector2 force)
     {
-        if (mass == 0) return;
-        addSpeed += force / mass;
+		this.force += force;
     }
 
     public void SetXSpeed(float x)
