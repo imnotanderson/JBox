@@ -12,6 +12,22 @@ public enum Dir
 
 public class Box
 {
+	public Box parent{
+		set{
+			if (_parent != null) {
+				_parent.childBoxList.Remove (this);
+			}
+			_parent = value;
+			if (_parent != null) {
+				_parent.childBoxList.Add (this);
+			}
+		}
+		get{
+			return _parent;
+		}
+	}
+	Box _parent = null;
+	public List<Box> childBoxList = new List<Box> ();
 	public object data;
     public string name = "";
     const float IGNORE_RANGE = 0f;
@@ -29,6 +45,7 @@ public class Box
         get { return this._pos; }
     }
     Vector2 _pos;
+	public bool isTrigger = false;
     /// <summary>
     /// half width and height--
     /// </summary>
@@ -38,6 +55,7 @@ public class Box
     Action<Box> onEnterOtherBox;
     Action<Box> onExitOtherBox;
     Action<Vector2> onPosChange;
+	Action<Box,float> onUpt;
     public Vector2 speed
     {
         set
@@ -54,6 +72,33 @@ public class Box
     }
     Vector2 _speed;
     Vector2 addSpeed = Vector2.zero;
+	/// <summary>
+	/// 额外附加速度--
+	/// </summary>
+	/// <value>The extra speed.</value>
+	public Vector2 extraSpeed{
+		set{ 
+			_extraSpeed = value;
+		}
+		get{
+			Vector2 tmVal = _extraSpeed;
+			_extraSpeed = Vector2.zero;
+			return tmVal;
+		}
+	}
+	Vector2 _extraSpeed = Vector2.zero;
+	public Vector2 extraForce{
+		set{ 
+			_extraForce = value;
+		}
+		get{
+			Vector2 tmVal = _extraForce;
+			_extraForce = Vector2.zero;
+			return tmVal;
+		}
+	}
+	Vector2 _extraForce = Vector2.zero;
+
     public World world;
 
 
@@ -73,6 +118,10 @@ public class Box
         this.mass = mass;
         return this;
     }
+
+	public void SetOnUpt(Action<Box,float> onUpt){
+		this.onUpt = onUpt;
+	}
 
     public Box SetEnterOtherBoxCallback(Action<Box> callback)
     {
@@ -103,6 +152,12 @@ public class Box
             onExitOtherBox(other);
     }
 
+	public void Upt(float deltaTime){
+		if (onUpt != null) {
+			onUpt (this,deltaTime);
+		}
+	}
+
 
     #endregion
 
@@ -119,10 +174,17 @@ public class Box
         var pos = this.pos;
         pos.x += x;
         this.pos = pos;
+		if (this.isTrigger) {
+			foreach (var actorBox in world.BoxList) {
+				var tmXInBoxCheck = (this.CheckMoveBoxX(actorBox, new Vector2(x,0)));
+				if(tmXInBoxCheck!= BoxCheckResult.OutBox)
+				actorBox.MoveToPivotPos (this, actorBox.pos, Vector2.right * -x);
+			}
+		}
     }
 
     public void SetPosYAdd(float y)
-    {
+    { 
         var pos = this.pos;
         pos.y += y;
         this.pos = pos;
@@ -143,7 +205,11 @@ public class Box
     public void Move(float stepTime)
     {
         AddSpeed();
-        world.MoveBox(this, speed * stepTime);
+		world.MoveBox(this, (speed+this.extraSpeed) * stepTime);
+		for (int i = 0; i < childBoxList.Count; i++) {
+			var childBox = childBoxList [i];
+			world.MoveBox (this, speed * stepTime);
+		}
     }
     
     public Box Clone()

@@ -21,8 +21,17 @@ public class World
 
     public void Upt(float deltaTime)
     {
+		foreach (var box in boxList) {
+			box.Upt (deltaTime);
+		}
+
+		foreach (var box in triggerList) {
+			box.Upt (deltaTime);
+		}
+
         foreach (Box box in boxList)
         {
+			box.ApplyForce (box.extraForce);
             box.ApplyForce(-Vector2.up * g);
             box.Move(deltaTime);
         }
@@ -33,6 +42,7 @@ public class World
     public void AddBox(Box box, bool isTrigger = false)
     {
         box.world = this;
+		box.isTrigger = isTrigger;
         var list = isTrigger ? triggerList : boxList;
         list.Add(box);
     }
