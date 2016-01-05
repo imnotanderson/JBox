@@ -12,6 +12,7 @@ public enum Dir
 
 public class Box
 {
+	public bool isGnoreCalc = false;
 	public Box parent{
 		set{
 			if (_parent != null) {

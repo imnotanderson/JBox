@@ -6,7 +6,6 @@ using System.Collections.Generic;
 
 public class World
 {
-
     #region debug
     public Box testBox = null;
     public List<Box> BoxList { get { return boxList; } }
@@ -57,6 +56,9 @@ public class World
         List<Box> enterBoxList = new List<Box>();
         foreach (var b in triggerList)
         {
+			if (b.isGnoreCalc) {
+				continue;
+			}
             Box.BoxCheckResult tmXInBoxCheck ;
             Box.BoxCheckResult tmYInBoxCheck ;
             tmXInBoxCheck = (box.CheckMoveBoxX(b, xSpeed));
